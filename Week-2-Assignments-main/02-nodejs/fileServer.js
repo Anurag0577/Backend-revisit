@@ -16,10 +16,41 @@
 
     Testing the server - run `npm run test-fileServer` command in terminal
  */
-const express = require('express');
-const fs = require('fs');
-const path = require('path');
-const app = express();
+const express = require('express'); // import express from express
+const fs = require('fs'); // import fs library of JS
+const path = require('path'); // path is a built in path module, which is used to handle or manipulate path of files or directory.
+const app = express(); // create an instance of express library, store that in app variable.
+const PORT  = 3000;
+
+app.get('/files', (req, res) => {
+  let folderPath = path.join(__dirname, '/files');
+  console.log(folderPath);
+  fs.readdir(folderPath, (err, data) => {
+    res.status(200).send(data);
+  })
+})
+
+app.get('/file/:filename', (req, res) => {
+  let filePath = path.join(__dirname, './files' , req.params.filename);
+  console.log(`file path: ${filePath}`);
+  fs.readFile(filePath, (err, data) => {
+    if(err){
+      console.log("Something seems wrong!")
+      res.status(404);
+    }
+    res.status(200).send(data);
+  })
+})
+
+app.all('*', (req, res) => {
+  res.status(404).send("Page not found!")
+})
+
+
+// listen all the request on 3000 port
+app.listen(3000, () => {
+  console.log("Server start running on 3000");
+})
 
 
 module.exports = app;
