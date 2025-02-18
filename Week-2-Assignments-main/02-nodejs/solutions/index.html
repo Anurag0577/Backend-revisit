@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Todo app</title>
+</head>
+<script> 
+
+function parseResponse1(data){
+    console.log(data); 
+    for(let i = 0; i < data.length; i++){
+        let parentElemeny = document.getElementById('todos');
+        let childElement = document.createElement('div');
+        childElement.innerHTML = data[i].title;
+        parentElemeny.appendChild(childElement);
+    }
+
+}
+function callback1(resp) {
+    resp.json().then(parseResponse1);
+}
+function getData (){
+    fetch('http://localhost:3000/todos', {
+        method: 'GET',
+    }).then(callback1)
+}
+
+getData();
+
+function parseResponse(data) {
+    console.log(data);  
+}
+function callback(resp) {
+    resp.json().then(parseResponse);
+}
+function onPress() {
+    let title = document.getElementById('title').value;
+    let description = document.getElementById('description').value;
+    console.log(title);
+
+
+    fetch('http://localhost:3000/todos', {  // Sends a GET request to the server's /todos endpoint
+        method: 'POST',  // The method is GET, meaning we are trying to retrieve data (not send any)
+        body: JSON.stringify({
+            title: title,
+        description: description
+        }),
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    }).then(callback);  // Once the request is completed, the callback function is called with the response
+    getData();
+}
+// CORS (Cross-Origin Resource Sharing) error occurs when a web page tries to request resources from a different domain without proper permissions. This happens due to browser security policies that block unauthorized cross-origin requests. To fix it, the server must include the appropriate Access-Control-Allow-Origin header in its response, specifying allowed origins or using * to permit all. Alternatively, enabling CORS via server configuration or using a proxy can help bypass restrictions.
+
+// When you click the button on the page, you may encounter a CORS error in the console. This is because the server is not configured to accept requests from the client-side code. To resolve this, you can use a proxy server or configure the server to accept requests from the client-side code.
+
+// generally fetch let you send request anywhere, you can send request to chatGPT also, which is not good, so to prevent this, we have to use cors, which is a middleware that allows only specific request to be sent to the server.
+
+// Make sure their frontend is serve to same url as the backend.
+
+</script>
+<body>
+    Todo title
+    <input type="text" id="title" />
+    <br /> 
+    Todo description
+    <input type="text" id="description" />
+    <br />
+    <button onclick="onPress()">Add todo</button>
+
+    <div id="todos">fdgdsfsd
+    </div>
+</body>
+</html>
