@@ -82,7 +82,7 @@ app.delete('/todos/:id', (req, res) => {
     res.status(404).send();
   } else {
     todos = removeAtIndex(todos, todoIndex);
-    res.status(200).send();
+    res.status(200).send(todos);
   }
 });
 

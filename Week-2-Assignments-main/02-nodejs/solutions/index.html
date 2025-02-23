@@ -3,17 +3,249 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Todo App</title>
+    <style>
+        /* General Styles */
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        /* Container for the Todo App */
+        .container {
+            background-color: #fff;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            width: 400px;
+            max-width: 100%;
+        }
+
+        h1 {
+            text-align: center;
+            color: #555;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Input Fields */
+        input[type="text"] {
+            width: 100%;
+            padding: 0.75rem;
+            margin-bottom: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="text"]:focus {
+            border-color: #6c63ff;
+        }
+
+        /* Add Todo Button */
+        button {
+            width: 100%;
+            padding: 0.75rem;
+            background-color: #6c63ff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #574fdb;
+        }
+
+        /* Todo List */
+        #todos {
+            margin-top: 1.5rem;
+        }
+
+        .todo-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-bottom: 0.5rem;
+            background-color: #f9f9f9;
+            transition: background-color 0.3s ease;
+        }
+
+        .todo-item:hover {
+            background-color: #f1f1f1;
+        }
+
+        .todo-item span {
+            flex: 1;
+            margin-right: 1rem;
+        }
+
+        .todo-item span:last-child {
+            color: #ff4d4d;
+            cursor: pointer;
+            font-weight: bold;
+            text-align: right;
+        }
+
+        .todo-item span:last-child:hover {
+            color: #e60000;
+        }
+    </style>
+</head>
+<script>
+    function parseResponse1(data) {
+        console.log(data);
+        let parentElement = document.getElementById('todos');
+        parentElement.innerHTML = ''; // Clear existing todos
+        for (let i = 0; i < data.length; i++) {
+            let childElement = document.createElement('div');
+            childElement.className = 'todo-item';
+
+            let grandChildElement1 = document.createElement('span');
+            grandChildElement1.innerHTML = data[i].title;
+
+            let grandChildElement2 = document.createElement('span');
+            grandChildElement2.innerHTML = data[i].description;
+
+            let grandChildElement3 = document.createElement('span');
+            grandChildElement3.innerHTML = "Delete";
+            grandChildElement3.onclick = function () {
+                deleteTodo(data[i].id); // Add delete functionality
+            };
+
+            childElement.appendChild(grandChildElement1);
+            childElement.appendChild(grandChildElement2);
+            childElement.appendChild(grandChildElement3);
+
+            parentElement.appendChild(childElement);
+        }
+    }
+
+    function callback1(resp) {
+        if (!resp.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return resp.json().then(parseResponse1);
+    }
+
+    function getData() {
+        fetch('http://localhost:3000/todos', {
+            method: 'GET',
+        })
+            .then(callback1)
+            .catch(error => {
+                console.error('There was a problem with the fetch operation:', error);
+            });
+    }
+
+    function parseResponse(data) {
+        console.log(data);
+    }
+
+    function callback(resp) {
+        if (!resp.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return resp.json().then(parseResponse).then(getData);
+    }
+
+    function onPress() {
+        let title = document.getElementById('title').value;
+        let description = document.getElementById('description').value;
+
+        fetch('http://localhost:3000/todos', {
+            method: 'POST',
+            body: JSON.stringify({
+                title: title,
+                description: description
+            }),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(callback)
+            .catch(error => {
+                console.error('There was a problem with the fetch operation:', error);
+            });
+
+        document.getElementById('title').value = '';
+        document.getElementById('description').value = '';
+    }
+
+    function deleteTodo(id) {
+        fetch(`http://localhost:3000/todos/${id}`, {
+            method: 'DELETE',
+        })
+            .then(() => getData())
+            .catch(error => {
+                console.error('There was a problem with the fetch operation:', error);
+            });
+    }
+
+    getData();
+</script>
+<body>
+    <div class="container">
+        <h1>Todo App</h1>
+        <input type="text" id="title" placeholder="Todo title" />
+        <input type="text" id="description" placeholder="Todo description" />
+        <button onclick="onPress()">Add Todo</button>
+        <div id="todos"></div>
+    </div>
+</body>
+</html>
+
+
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Todo app</title>
 </head>
 <script> 
 
 function parseResponse1(data){
     console.log(data); 
+    let parentElement = document.getElementById('todos');
+    parentElement.innerHTML = ''; // Clear todos here
     for(let i = 0; i < data.length; i++){
-        let parentElemeny = document.getElementById('todos');
+        
         let childElement = document.createElement('div');
-        childElement.innerHTML = data[i].title;
+
+        let grandChildElement1 = document.createElement('span');
+        grandChildElement1.innerHTML = data[i].title;
+
+        let grandChildElement2 = document.createElement('span');
+        grandChildElement2.innerHTML = data[i].description;
+
+
+        let grandChildElement3 = document.createElement('button');
+        grandChildElement3.innerHTML = "Delete";
+        grandChildElement3.onclick = function () {
+            deleteTodo(data[i].id);
+        };    
+        
+
+        childElement.appendChild(grandChildElement1);
+        childElement.appendChild(grandChildElement2);
+        childElement.appendChild(grandChildElement3);
+
         parentElemeny.appendChild(childElement);
+
     }
 
 }
@@ -23,7 +255,7 @@ function callback1(resp) {
 function getData (){
     fetch('http://localhost:3000/todos', {
         method: 'GET',
-    }).then(callback1)
+    }).then(callback1);
 }
 
 getData();
@@ -49,8 +281,23 @@ function onPress() {
         headers: {
             'Content-Type': 'application/json'
         }
-    }).then(callback);  // Once the request is completed, the callback function is called with the response
-    getData();
+    }).then(callback).then(getData);  // Once the request is completed, the callback function is called with the response
+    document.getElementById('title').value = '';
+    document.getElementById('description').value = '';
+}
+
+function parseResponse2(data){
+    console.log(data);
+}
+
+function callback2(resp){
+    resp.json().then(parseResponse2);
+}
+
+function deleteElement(id){
+    fetch(`http://localhost/3000/todos/${id}`, {
+        method: 'DELETE'
+    }).then(getData);
 }
 // CORS (Cross-Origin Resource Sharing) error occurs when a web page tries to request resources from a different domain without proper permissions. This happens due to browser security policies that block unauthorized cross-origin requests. To fix it, the server must include the appropriate Access-Control-Allow-Origin header in its response, specifying allowed origins or using * to permit all. Alternatively, enabling CORS via server configuration or using a proxy can help bypass restrictions.
 
@@ -70,7 +317,7 @@ function onPress() {
     <br />
     <button onclick="onPress()">Add todo</button>
 
-    <div id="todos">fdgdsfsd
+    <div id="todos">
     </div>
 </body>
-</html>
+</html> -->
